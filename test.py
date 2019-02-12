@@ -16,7 +16,8 @@ if __name__ == '__main__':
     parser.set_defaults(no_graphics=False, episodes=1)
     args = parser.parse_args()
     #
-    env = UnityEnvironment(file_name="Reacher_Linux20/Reacher.x86_64", no_graphics=args.no_graphics)
+    # env = UnityEnvironment(file_name="Reacher_Linux20/Reacher.x86_64", no_graphics=args.no_graphics)
+    env = UnityEnvironment(file_name="Reacher.app", no_graphics=args.no_graphics)
     brain_name = env.brain_names[0]
     brain = env.brains[brain_name]
 

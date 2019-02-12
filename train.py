@@ -3,7 +3,7 @@ import argparse
 import logging
 from unityagents import UnityEnvironment
 
-from r_agent import RandomAgent as Agent
+from ddpg_agent import Agent
 
 log = logging.getLogger(__name__)
 
@@ -16,7 +16,8 @@ if __name__ == '__main__':
     parser.set_defaults(no_graphics=False, episodes=5)
     args = parser.parse_args()
     #
-    env = UnityEnvironment(file_name="Reacher_Linux/Reacher.x86_64", no_graphics=args.no_graphics)
+    # env = UnityEnvironment(file_name="Reacher_Linux/Reacher.x86_64", no_graphics=args.no_graphics)
+    env = UnityEnvironment(file_name="Reacher.app", no_graphics=args.no_graphics)
     brain_name = env.brain_names[0]
     brain = env.brains[brain_name]
     env_info = env.reset(train_mode=False)[brain_name]
@@ -38,7 +39,7 @@ if __name__ == '__main__':
         env_info = env.reset(train_mode=False)[brain_name]
         b_agent.reset_episode()
         while True:
-            action = b_agent.act(state, use_egreedy=True)
+            action = b_agent.act(state)
             env_info = env.step(action)[brain_name]
             at_step += 1
             next_state = env_info.vector_observations[0]
@@ -48,7 +49,7 @@ if __name__ == '__main__':
                 log.info("ep:{} step:{} r:{} l:{}".format(epx, at_step, b_agent.cum_rewards(), b_agent.ave_loss()))
             if done:
                 break
-            b_agent.sense(state, action, reward, next_state, learn=True)
+            b_agent.sense(state, action, reward, next_state, done)
             state = next_state
         print("{},{}".format(epx, b_agent.cum_rewards()))
         b_agent.save()
