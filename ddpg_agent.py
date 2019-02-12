@@ -3,6 +3,7 @@ from collections import deque
 import logging
 import numpy as np
 import random
+import time
 
 from model import Actor, Critic
 from utils import ReplayBuffer, OUNoise
@@ -26,7 +27,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 class Agent():
-    def __init__(self, model_name, state_size, action_size, random_seed=0):
+    def __init__(self, model_name, state_size, action_size):
         """Initialize an Agent object.
 
         Params
@@ -38,6 +39,7 @@ class Agent():
         self.model_name = model_name
         self.state_size = state_size
         self.action_size = action_size
+        random_seed = int(time.time())
         self.seed = random.seed(random_seed)
         self.rewards = list()
         self.losses = deque(maxlen=100)
@@ -150,7 +152,9 @@ class Agent():
         cfn = "{}_critic.mdl".format(self.model_name)
         state_dict = torch.load(afn)
         self.actor_local.load_state_dict(state_dict)
+        self.actor_target.load_state_dict(state_dict)
         state_dict = torch.load(cfn)
+        self.critic_local.load_state_dict(state_dict)
         self.critic_target.load_state_dict(state_dict)
         log.info("loaded {}, {}".format(afn, cfn))
         return self

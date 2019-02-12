@@ -16,8 +16,8 @@ if __name__ == '__main__':
     parser.set_defaults(no_graphics=False, episodes=5)
     args = parser.parse_args()
     #
-    # env = UnityEnvironment(file_name="Reacher_Linux/Reacher.x86_64", no_graphics=args.no_graphics)
-    env = UnityEnvironment(file_name="Reacher.app", no_graphics=args.no_graphics)
+    env = UnityEnvironment(file_name="Reacher_Linux/Reacher.x86_64", no_graphics=args.no_graphics)
+    # env = UnityEnvironment(file_name="Reacher.app", no_graphics=args.no_graphics)
     brain_name = env.brain_names[0]
     brain = env.brains[brain_name]
     env_info = env.reset(train_mode=False)[brain_name]
@@ -34,9 +34,10 @@ if __name__ == '__main__':
     except:
         pass
 
+    max_rewards = -1.0
     for epx in range(1, args.episodes + 1):
         at_step = 0
-        env_info = env.reset(train_mode=False)[brain_name]
+        env_info = env.reset(train_mode=True)[brain_name]
         b_agent.reset_episode()
         while True:
             action = b_agent.act(state)
@@ -51,7 +52,10 @@ if __name__ == '__main__':
                 break
             b_agent.sense(state, action, reward, next_state, done)
             state = next_state
-        print("{},{}".format(epx, b_agent.cum_rewards()))
-        b_agent.save()
+        this_rewards = b_agent.cum_rewards()
+        print("{},{}".format(epx, this_rewards), flush=True)
+        if this_rewards > max_rewards:
+            b_agent.save()
+            max_rewards = this_rewards
 
     log.info("finished.")
