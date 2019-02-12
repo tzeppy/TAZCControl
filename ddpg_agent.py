@@ -43,6 +43,7 @@ class Agent():
         self.seed = random.seed(random_seed)
         self.rewards = list()
         self.losses = deque(maxlen=100)
+        self.stepn = 0
 
         # Actor Network (w/ Target Network)
         self.actor_local = Actor(state_size, action_size, random_seed).to(device)
@@ -63,13 +64,16 @@ class Agent():
     def sense(self, state, action, reward, next_state, done):
         """Save experience in replay memory, and use random sample from buffer to learn."""
         # Save experience / reward
-        self.memory.add(state, action, reward, next_state, done)
+        self.stepn += 1
+        if reward or self.stepn % 2 == 0:
+            self.memory.add(state, action, reward, next_state, done)
         self.rewards.append(reward)
 
         # Learn, if enough samples are available in memory
         if len(self.memory) > BATCH_SIZE:
-            experiences = self.memory.sample()
-            self.learn(experiences, GAMMA)
+            if self.stepn % 5 == 0:
+                experiences = self.memory.sample()
+                self.learn(experiences, GAMMA)
 
     def act(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
@@ -85,6 +89,7 @@ class Agent():
     def reset_episode(self):
         self.rewards = list()
         self.noise.reset()
+        self.stepn = 0
 
     def ave_loss(self):
         return sum(self.losses) / max(1, len(self.losses))
