@@ -15,13 +15,13 @@ import torch.optim as optim
 
 log = logging.getLogger(__name__)
 
-BUFFER_SIZE = int(1e6)  # replay buffer size
+BUFFER_SIZE = int(1e5)  # replay buffer size
 BATCH_SIZE = 128        # minibatch size
 GAMMA = 0.99            # discount factor
 TAU = 1e-3              # for soft update of target parameters
 LR_ACTOR = 1e-4         # learning rate of the actor
-LR_CRITIC = 3e-4        # learning rate of the critic
-WEIGHT_DECAY = 0.0001   # L2 weight decay
+LR_CRITIC = 1e-3        # learning rate of the critic
+WEIGHT_DECAY = 0.0   # L2 weight decay
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -39,8 +39,8 @@ class Agent():
         self.model_name = model_name
         self.state_size = state_size
         self.action_size = action_size
-        random_seed = int(time.time())
-        self.seed = random.seed(random_seed)
+        random_seed = time.time()
+        random.seed(random_seed)
         self.rewards = list()
         self.losses = deque(maxlen=100)
         self.stepn = 0
